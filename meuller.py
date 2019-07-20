@@ -22,7 +22,7 @@ def get_soup():
     return soup
 
 def get_sources():
-    #soup = get_soup()
+    soup = get_soup()
     pages = soup.find_all("div", { "class": 'g-doc-page has-ocr'})
     results = []
     footnotes = []
@@ -48,27 +48,22 @@ def get_pg_vol(pgvol):
     try:
         vol = pieces[1][0:1]
         pg = pieces[3]
-    except IndexError as e:
+    except IndexError:
         return 'appendix', pieces[1]
     return vol, pg
 
 def write_sources():
     body, footnotes = get_sources()
-    count = 0 
     with open('meuller_body.csv', mode = 'w') as f:
         w = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         w.writerow(['volume', 'page', 'anchor text', 'link'])
         for link in body:
-            count += 1
-            print ('body', count)
             vol, pg = get_pg_vol(link[2])
             w.writerow([vol, pg, link[1], link[0]])
     with open('meuller_footnotes.csv', mode = 'w') as f:
         w = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         w.writerow(['footnote', 'volume', 'page', 'anchor text', 'link'])
         for link in footnotes:
-            count += 1
-            print('footnote', count)
             vol, pg = get_pg_vol(link[2])
             w.writerow([link[3], vol, pg, link[1], link[0]])
 
